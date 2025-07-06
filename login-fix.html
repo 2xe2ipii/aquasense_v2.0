@@ -1,0 +1,61 @@
+        // Login form handling - CLEAN VERSION
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            
+            // Reset messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            btnText.textContent = 'Signing in...';
+            
+            try {
+                // Server-side authentication ONLY
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successMessage.textContent = '✅ Login successful! Redirecting to dashboard...';
+                    successMessage.style.display = 'block';
+                    
+                    // Store login state
+                    sessionStorage.setItem('aquasense_logged_in', 'true');
+                    sessionStorage.setItem('aquasense_username', username);
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    errorMessage.textContent = result.message || '❌ Invalid username or password. Please try again.';
+                    errorMessage.style.display = 'block';
+                    
+                    // Re-enable button
+                    loginBtn.disabled = false;
+                    btnText.textContent = 'Sign In';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = '❌ Connection error. Please try again.';
+                errorMessage.style.display = 'block';
+                
+                // Re-enable button
+                loginBtn.disabled = false;
+                btnText.textContent = 'Sign In';
+            }
+        });

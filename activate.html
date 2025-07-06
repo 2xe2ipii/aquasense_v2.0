@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DO Test Mode Control Panel</title>
+    <script>
+        let intervalIds = {};
+        let testActive = false;
+
+        async function startAllDOTests() {
+            testActive = true;
+            const cages = ['cage1', 'cage2', 'cage3'];
+            
+            // Send initial values to all cages
+            for (const cageId of cages) {
+                const doValue = (Math.random() * 0.5 + 6.0).toFixed(1);
+                await sendTestValue(cageId, doValue);
+            }
+            
+            // Set up continuous sending every 5 seconds
+            intervalIds['all'] = setInterval(() => {
+                for (const cageId of cages) {
+                    const doValue = (Math.random() * 0.5 + 6.0).toFixed(1);
+                    sendTestValue(cageId, doValue);
+                }
+            }, 5000);
+
+            alert(`Test Mode Activated\nSending DO values 2.0-2.5 to all cages`);
+        }
+
+        async function sendTestValue(cageId, doValue) {
+            try {
+                const response = await fetch(`/activate/test/${cageId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ doValue })
+                });
+                const result = await response.json();
+                console.log('Sent to', cageId, ':', result);
+            } catch (err) {
+                console.error('Error sending to', cageId, ':', err);
+            }
+        }
+
+        async function stopAllDOTests() {
+            clearInterval(intervalIds['all']);
+            testActive = false;
+            alert(`Test Mode Deactivated\nStopped sending test values`);
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .control-panel {
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            background: #f9f9f9;
+            max-width: 300px;
+            text-align: center;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <h1>DO Test Mode Control</h1>
+    
+    <div class="control-panel">
+        <button onclick="startAllDOTests()">Activate Test Mode</button>
+        <button class="reset-btn" onclick="stopAllDOTests()">Reset to Normal</button>
+    </div>
+</body>
+</html>
+

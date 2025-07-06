@@ -1,0 +1,23 @@
+<!-- Add this to debug the login issue -->
+<script>
+// Add debugging to see what's happening
+console.log('=== LOGIN DEBUG ===');
+
+// Test if server endpoints are available
+fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'test', password: 'test' })
+})
+.then(response => {
+    console.log('Server response status:', response.status);
+    return response.json();
+})
+.then(data => {
+    console.log('Server response data:', data);
+})
+.catch(error => {
+    console.error('Server connection failed:', error);
+    console.log('This means the server API is not working');
+});
+</script>

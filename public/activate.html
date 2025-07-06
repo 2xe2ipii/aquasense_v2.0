@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaSense - Activate Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+        }
+        
+        .test-section h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219a52;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .result.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 AquaSense Test Activation</h1>
+        
+        <div class="test-section">
+            <h3>Test All Cages (1-3)</h3>
+            <p>Send test DO values to all cages with DO sensors.</p>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="testAllCages()">Test All Cages</button>
+            </div>
+            <div id="test-all-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Individual Cages</h3>
+            <p>Send test DO values to specific cages.</p>
+            <div class="button-group">
+                <button class="btn btn-success" onclick="testCage('cage1')">Test Cage 1</button>
+                <button class="btn btn-success" onclick="testCage('cage2')">Test Cage 2</button>
+                <button class="btn btn-success" onclick="testCage('cage3')">Test Cage 3</button>
+            </div>
+            <div id="test-individual-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Reset to Live Data</h3>
+            <p>Clear test overrides and resume live ESP32 data.</p>
+            <div class="button-group">
+                <button class="btn btn-warning" onclick="resetToLive()">Reset to Live Data</button>
+            </div>
+            <div id="reset-result" class="result"></div>
+        </div>
+        
+        <a href="/" class="back-link">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function testAllCages() {
+            try {
+                const response = await fetch('/activate/test');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const values = result.results.map(r => `${r.cage}: ${r.do} mg/L`).join(', ');
+                    showResult('test-all-result', `✅ ${result.message}. Values: ${values}`);
+                } else {
+                    showResult('test-all-result', `❌ Test failed: ${result.message}`, false);
+                }
+            } catch (error) {
+                showResult('test-all-result', `❌ Error: ${error.message}`, false);
+            }
+        }
+        
+        async function testCage(cage) {
+            try {
+                const response = await fetch(`/activate/test/${cage}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('test-individual-result', `✅ ${result.message}. Value: ${result.value} mg/L`);
+                } else {
+                    showResult('test-individual-result', `❌ Test failed: ${result.message}`, false);
+                }
+            } catch (error) {
+                showResult('test-individual-result', `❌ Error: ${error.message}`, false);
+            }
+        }
+        
+        async function resetToLive() {
+            try {
+                const response = await fetch('/activate/reset');
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('reset-result', `✅ ${result.message}`);
+                } else {
+                    showResult('reset-result', `❌ Reset failed: ${result.message}`, false);
+                }
+            } catch (error) {
+                showResult('reset-result', `❌ Error: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaSense - Login</title>
+    <link rel="icon" type="image/png" href="logo_aquasense.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(30, 41, 59, 0.3) 100%), url('taal_lake.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            padding: 48px;
+            border-radius: 24px;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            animation: slideIn 0.6s ease-out;
+            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            margin-bottom: 36px;
+        }
+        
+        .logo h1 {
+            font-size: 36px;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .logo p {
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+        
+        .description {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 16px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .description p {
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0;
+            text-align: left;
+            font-weight: 400;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: -0.01em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            font-weight: 400;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(59, 130, 246, 0.25);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #27ae60, #219a52);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .credentials-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .credentials-info h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .credentials-info p {
+            font-size: 14px;
+            color: #34495e;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .credentials-info code {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+        
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.25) 0%, rgba(30, 41, 59, 0.25) 100%), url('mobile.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }
+            
+            .login-container {
+                padding: 36px 28px;
+                margin: 20px;
+                max-width: 85%;
+                border-radius: 20px;
+            }
+            
+            .logo {
+                margin-bottom: 28px;
+            }
+            
+            .logo h1 {
+                font-size: 32px;
+                margin-bottom: 6px;
+            }
+            
+            .logo p {
+                font-size: 15px;
+            }
+            
+            .description {
+                margin-bottom: 24px;
+                padding: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            .form-group label {
+                margin-bottom: 6px;
+                font-size: 13px;
+            }
+            
+            .form-group input {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+            
+            .login-btn {
+                padding: 14px;
+                font-size: 15px;
+                margin-bottom: 16px;
+            }
+            
+            .credentials-info {
+                margin-top: 25px;
+                padding: 18px;
+            }
+            
+            .credentials-info h4 {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .credentials-info p {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 24px 20px;
+                margin: 16px;
+                max-width: 90%;
+            }
+            
+            .logo {
+                margin-bottom: 24px;
+            }
+            
+            .logo h1 {
+                font-size: 28px;
+                margin-bottom: 4px;
+            }
+            
+            .logo p {
+                font-size: 14px;
+            }
+            
+            .description {
+                margin-bottom: 20px;
+                padding: 16px;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 4px;
+            }
+            
+            .form-group input {
+                padding: 12px 14px;
+                font-size: 15px;
+            }
+            
+            .login-btn {
+                padding: 12px;
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .credentials-info {
+                margin-top: 16px;
+                padding: 14px;
+            }
+            
+            .credentials-info h4 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .credentials-info p {
+                font-size: 12px;
+                flex-direction: column;
+                gap: 4px;
+                align-items: center;
+            }
+            
+            .credentials-info code {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles">
+        <!-- Particles will be added by JavaScript -->
+    </div>
+    
+    <div class="login-container">
+        <div class="logo">
+            <h1>
+                <img src="logo_aquasense.png" alt="AquaSense Logo" style="width: 50px; height: 50px; margin-right: 12px; vertical-align: middle;">AquaSense
+            </h1>
+            <p>Water Quality Monitoring System</p>
+        </div>
+        
+        <div class="description">
+            <p>Monitor dissolved oxygen levels, voltage, current, and battery status across your aquaculture cages in real-time.</p>
+        </div>
+        
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="login-btn" id="login-btn">
+                <span id="btn-text">Sign In</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.querySelector('.floating-particles');
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 6 + 4 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Initialize particles
+        createParticles();
+        
+        // Login form handling - CLEAN SERVER-ONLY VERSION
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            
+            // Reset messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            btnText.textContent = 'Signing in...';
+            
+            // Clean server-side authentication only
+            const validCredentials = [
+                { username: 'admin', password: 'password123' },
+                { username: 'operator', password: 'aquasense2024' }
+            ];
+            
+            // Server-side authentication
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                const isValid = result.success;
+            
+            if (isValid) {
+                successMessage.textContent = '✅ Login successful! Redirecting to dashboard...';
+                successMessage.style.display = 'block';
+                
+                // Store login state
+                sessionStorage.setItem('aquasense_logged_in', 'true');
+                sessionStorage.setItem('aquasense_username', username);
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            } else {
+                errorMessage.textContent = result.message || '❌ Invalid username or password. Please try again.';
+                errorMessage.style.display = 'block';
+                
+                // Re-enable button
+                loginBtn.disabled = false;
+                btnText.textContent = 'Sign In';
+            }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = '❌ Connection error. Please try again.';
+                errorMessage.style.display = 'block';
+                
+                // Re-enable button
+                loginBtn.disabled = false;
+                btnText.textContent = 'Sign In';
+            }
+        });
+        
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('aquasense_logged_in') === 'true') {
+                window.location.href = '/';
+            }
+        });
+        
+        // Add enter key support for password field
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('login-form').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

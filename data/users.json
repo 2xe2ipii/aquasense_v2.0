@@ -1,0 +1,14 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "f009ea15bf2a17968c3dfdd7a7aff8b22347c3710a0092b5203047c3cddcbf1c0c2f373379c1d04a53105862f4b6e8c6f4d4c6edcd35e27d903dfe1c889f5a5f",
+    "role": "administrator",
+    "lastPasswordChange": "2025-07-06T05:19:33.863Z"
+  },
+  "operator": {
+    "username": "operator",
+    "password": "956fc50672047dbda2e7157a95c03c8694fa9ccc1bbf6741983771ef6918af916bdd9bf3d731313b369a2a3cd7af6e05974e63a45d23e642ec5982308b8a3d4d",
+    "role": "operator",
+    "lastPasswordChange": "2025-07-06T05:19:33.868Z"
+  }
+}
