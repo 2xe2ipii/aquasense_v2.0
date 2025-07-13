@@ -834,11 +834,47 @@
             <div class="nav-item" data-view="cage4">
                 🔧 Main System
             </div>
+            <!-- Add Important Dates tab to navigation -->
+            <div class="nav-item" data-view="important-dates">
+                📅 Important Dates
+            </div>
             
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
         
         <div class="main-content">
+            <!-- Move Important Dates view to the top of main-content, matching other views -->
+            <div id="important-dates-view" style="display: none;">
+                <div class="do-chart-container" style="border: 3px solid #27ae60; background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%); position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div>
+                            <h3 style="color: #27ae60; font-size: 22px; font-weight: bold; margin: 0;">Important Dates</h3>
+                            <div style="display: flex; gap: 20px; align-items: center; margin-top: 10px;">
+                                <label for="important-cage-select">Select Cage:</label>
+                                <select id="important-cage-select">
+                                    <option value="cage1">Cage 1</option>
+                                    <option value="cage2">Cage 2</option>
+                                    <option value="cage3">Cage 3</option>
+                                </select>
+                                <label for="important-date-select">Select Date:</label>
+                                <select id="important-date-select">
+                                    <option value="2025-06-04">June 4, 2025</option>
+                                    <option value="2025-06-11">June 11, 2025</option>
+                                    <option value="2025-06-15">June 15, 2025</option>
+                                    <option value="2025-06-18">June 18, 2025</option>
+                                    <option value="2025-06-21">June 21, 2025</option>
+                                    <option value="2025-06-25">June 25, 2025</option>
+                                    <option value="2025-07-02">July 2, 2025</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="important-dates-do-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
             <div class="header">
                 <h2 id="page-title">Dashboard Overview</h2>
                 <div style="display: flex; gap: 10px; align-items: center;">
@@ -3232,6 +3268,7 @@
             currentView = view;
             const dashboardView = document.getElementById('dashboard-view');
             const cageView = document.getElementById('cage-view');
+            const importantDatesView = document.getElementById('important-dates-view');
             const pageTitle = document.getElementById('page-title');
             
             // Update navigation highlighting
@@ -3246,33 +3283,31 @@
             if (view === 'dashboard') {
                 dashboardView.style.display = 'block';
                 cageView.style.display = 'none';
+                importantDatesView.style.display = 'none';
                 pageTitle.textContent = 'Dashboard Overview';
-                
-                // Set time range selector value
                 const dashboardTimeRange = document.getElementById('dashboard-time-range');
                 if (dashboardTimeRange) {
                     dashboardTimeRange.value = currentTimeRange;
                 }
-                
-                // Refresh dashboard chart with current time range
                 setTimeout(() => refreshDashboardChart(), 100);
+            } else if (view === 'important-dates') {
+                dashboardView.style.display = 'none';
+                cageView.style.display = 'none';
+                importantDatesView.style.display = 'block';
+                pageTitle.textContent = 'Important Dates';
+                updateImportantDatesView();
             } else {
+                // Any cage view (cage1, cage2, cage3, cage4)
                 dashboardView.style.display = 'none';
                 cageView.style.display = 'block';
-                if (view === 'cage4') {
-                    pageTitle.textContent = 'Main System Details';
-                } else {
-                    pageTitle.textContent = `${view.charAt(0).toUpperCase() + view.slice(1)} Details`;
-                }
-                
-                // Set time range selector value
+                importantDatesView.style.display = 'none';
+                pageTitle.textContent =
+                    view === 'cage4' ? 'Main System Details' : `${view.charAt(0).toUpperCase() + view.slice(1)} Details`;
                 const cageTimeRange = document.getElementById('cage-time-range');
                 if (cageTimeRange) {
                     cageTimeRange.value = currentTimeRange;
                 }
-                
                 showCageDetails(view);
-                // Refresh cage charts with current time range - ensure data is loaded
                 if (Object.keys(allCageData).length > 0) {
                     setTimeout(() => {
                         loadAndRefreshCageData(view);
@@ -3281,8 +3316,6 @@
                     console.log('⚠️ Cage data not loaded yet for view switching');
                 }
             }
-            
-            // Close mobile menu after navigation
             closeMobileMenu();
         }
         
@@ -3613,6 +3646,68 @@
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         }
+
+        // Add logic to update the Important Dates view
+        function updateImportantDatesView() {
+            const cage = document.getElementById('important-cage-select').value;
+            const date = document.getElementById('important-date-select').value;
+            const chartCanvas = document.getElementById('important-dates-do-chart');
+            if (!chartCanvas) return;
+            if (window.importantDatesDOChart) {
+                window.importantDatesDOChart.destroy();
+            }
+            const data = allCageData[cage] || [];
+            const start = new Date(date + 'T00:00:00').getTime();
+            const end = new Date(date + 'T23:59:59').getTime();
+            const dayData = data.filter(d => d.timestamp >= start && d.timestamp <= end && typeof d.do === 'number' && !isNaN(d.do));
+            const labels = dayData.map(d => new Date(d.timestamp));
+            const doValues = dayData.map(d => d.do);
+            window.importantDatesDOChart = new Chart(chartCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'DO (mg/L)',
+                        data: doValues,
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        pointRadius: 2,
+                        pointHoverRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: `DO Level for ${cage.charAt(0).toUpperCase() + cage.slice(1)} on ${date}` }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'hour', displayFormats: { hour: 'HH:mm' } },
+                            title: { display: true, text: 'Time' }
+                        },
+                        y: {
+                            suggestedMin: 1.0,
+                            title: { display: true, text: 'DO (mg/L)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update event listeners for selects to use new chart logic
+        setTimeout(() => {
+            const cageSelect = document.getElementById('important-cage-select');
+            const dateSelect = document.getElementById('important-date-select');
+            if (cageSelect) cageSelect.addEventListener('change', updateImportantDatesView);
+            if (dateSelect) dateSelect.addEventListener('change', updateImportantDatesView);
+            // Initial render
+            updateImportantDatesView();
+        }, 500);
     </script>
 
 </body>
